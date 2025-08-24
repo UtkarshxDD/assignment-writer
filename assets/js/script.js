@@ -2,6 +2,12 @@ window.onload = function () {
     loadDarkModeFromLocalStorage();
     darkLightToggle()
     runOnLoad()
+    // Initialize page manager after everything else is loaded
+    setTimeout(() => {
+        if (typeof initializePageManager === 'function') {
+            initializePageManager();
+        }
+    }, 100);
 };
 
 function loadDarkModeFromLocalStorage(){

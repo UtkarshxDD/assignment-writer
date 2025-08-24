@@ -88,3 +88,45 @@
         linear-gradient(270deg, #696969 30%, rgba(0, 0, 0, 0) 31%);
     background-color: #b6b6b6;
 }
+
+/* Dark mode styles for new components */
+.ai-section {
+    background: #2d3748 !important;
+    border-left-color: var(--color-primary-darker) !important;
+}
+
+.manual-section {
+    background: #1a202c !important;
+    border-left-color: #4a5568 !important;
+}
+
+.page-management {
+    background: #2d3748 !important;
+    border-left-color: #38a169 !important;
+}
+
+.pagination-controls span {
+    background: #4a5568 !important;
+    color: rgb(185, 192, 198) !important;
+    border-color: rgb(71, 71, 71) !important;
+}
+
+.ai-section h3, .manual-section h3, .page-management h4 {
+    color: rgb(185, 192, 198) !important;
+}
+
+.ai-section h3 {
+    color: var(--color-primary-darker) !important;
+}
+
+.error-message {
+    background: #742a2a !important;
+    color: #fed7d7 !important;
+    border-color: #9b2c2c !important;
+}
+
+.success-message {
+    background: #276749 !important;
+    color: #c6f6d5 !important;
+    border-color: #38a169 !important;
+}

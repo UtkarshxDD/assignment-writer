@@ -30,7 +30,25 @@ function draw(){
     if(linespacing){
         textLeading(linespacing);
     }
-    data = "\n"+myData
+    
+    // Get current page text if page manager is available
+    let currentText = myData;
+    if (typeof pageManager !== 'undefined' && pageManager) {
+        const currentPage = pageManager.getCurrentPage();
+        if (currentPage && currentPage.text) {
+            currentText = currentPage.text;
+            // Update canvas settings from current page
+            xaxis = currentPage.xaxis;
+            yaxis = currentPage.yaxis;
+            fontsize = currentPage.fontsize;
+            w = currentPage.width;
+            linespacing = currentPage.linespacing;
+            textSize(fontsize);
+            textLeading(linespacing);
+        }
+    }
+    
+    data = "\n" + currentText;
     text(data, xaxis, yaxis, w, 900);
 }
 
@@ -61,6 +79,13 @@ function runOnLoad(){
         reader.readAsDataURL(fileupload.files[0]);
         reader.onload = function (e) {
             img = loadImage(e.target.result);
+            // Update current page background if page manager exists
+            if (typeof pageManager !== 'undefined' && pageManager) {
+                const currentPage = pageManager.getCurrentPage();
+                if (currentPage) {
+                    currentPage.backgroundImage = img;
+                }
+            }
         }
     };
 
@@ -80,4 +105,17 @@ function runOnLoad(){
         }
     };
 
+}
+
+// Enhanced updateTextContent function with page manager integration
+function updateTextContent(text) {
+    myData = text;
+    
+    // Update page manager if available
+    if (typeof pageManager !== 'undefined' && pageManager) {
+        const currentPage = pageManager.getCurrentPage();
+        if (currentPage) {
+            currentPage.text = text;
+        }
+    }
 }
