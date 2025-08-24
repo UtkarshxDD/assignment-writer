@@ -23,331 +23,791 @@ class GeminiAssignmentGenerator {
         localStorage.geminiApiKey = key;
     }
 
-    // Generate assignment prompt based on user inputs
-    generatePrompt(topic, type, wordCount) {
-        const baseInstructions = `
-Target length: Approximately ${wordCount} words (±10% is acceptable)
+    // Analyze topic to determine content type and approach
+    analyzeTopic(topic) {
+        const topicLower = topic.toLowerCase();
+        
+        // Academic subjects
+        if (topicLower.includes('history') || topicLower.includes('historical') || topicLower.includes('ancient') || topicLower.includes('medieval') || topicLower.includes('world war') || topicLower.includes('civilization')) {
+            return { type: 'academic', subject: 'history', approach: 'chronological' };
+        }
+        if (topicLower.includes('science') || topicLower.includes('scientific') || topicLower.includes('physics') || topicLower.includes('chemistry') || topicLower.includes('biology') || topicLower.includes('genetics') || topicLower.includes('evolution') || topicLower.includes('molecular') || topicLower.includes('quantum') || topicLower.includes('thermodynamics')) {
+            return { type: 'academic', subject: 'science', approach: 'analytical' };
+        }
+        if (topicLower.includes('math') || topicLower.includes('mathematics') || topicLower.includes('algebra') || topicLower.includes('calculus') || topicLower.includes('geometry') || topicLower.includes('statistics') || topicLower.includes('probability') || topicLower.includes('trigonometry')) {
+            return { type: 'academic', subject: 'mathematics', approach: 'problem-solving' };
+        }
+        if (topicLower.includes('literature') || topicLower.includes('book') || topicLower.includes('novel') || topicLower.includes('poem') || topicLower.includes('author') || topicLower.includes('shakespeare') || topicLower.includes('poetry') || topicLower.includes('drama') || topicLower.includes('fiction') || topicLower.includes('non-fiction')) {
+            return { type: 'academic', subject: 'literature', approach: 'analytical' };
+        }
+        if (topicLower.includes('philosophy') || topicLower.includes('philosophical') || topicLower.includes('ethics') || topicLower.includes('logic') || topicLower.includes('metaphysics') || topicLower.includes('epistemology') || topicLower.includes('existentialism') || topicLower.includes('stoicism')) {
+            return { type: 'academic', subject: 'philosophy', approach: 'theoretical' };
+        }
+        if (topicLower.includes('economics') || topicLower.includes('economic') || topicLower.includes('market') || topicLower.includes('supply') || topicLower.includes('demand') || topicLower.includes('inflation') || topicLower.includes('gdp') || topicLower.includes('trade') || topicLower.includes('finance') || topicLower.includes('banking')) {
+            return { type: 'academic', subject: 'economics', approach: 'analytical' };
+        }
+        if (topicLower.includes('psychology') || topicLower.includes('psychological') || topicLower.includes('behavior') || topicLower.includes('cognitive') || topicLower.includes('therapy') || topicLower.includes('mental health') || topicLower.includes('personality') || topicLower.includes('learning') || topicLower.includes('memory') || topicLower.includes('emotion')) {
+            return { type: 'academic', subject: 'psychology', approach: 'research-based' };
+        }
+        if (topicLower.includes('sociology') || topicLower.includes('social') || topicLower.includes('society') || topicLower.includes('culture') || topicLower.includes('community') || topicLower.includes('social change') || topicLower.includes('social structure') || topicLower.includes('socialization')) {
+            return { type: 'academic', subject: 'sociology', approach: 'social-analysis' };
+        }
+        if (topicLower.includes('geography') || topicLower.includes('geographic') || topicLower.includes('climate') || topicLower.includes('environment') || topicLower.includes('ecosystem') || topicLower.includes('biodiversity') || topicLower.includes('natural resources') || topicLower.includes('population')) {
+            return { type: 'academic', subject: 'geography', approach: 'spatial-analysis' };
+        }
+        if (topicLower.includes('political') || topicLower.includes('politics') || topicLower.includes('government') || topicLower.includes('democracy') || topicLower.includes('election') || topicLower.includes('policy') || topicLower.includes('legislation') || topicLower.includes('constitution') || topicLower.includes('international relations')) {
+            return { type: 'academic', subject: 'political-science', approach: 'policy-analysis' };
+        }
+        
+        // Current events and contemporary issues
+        if (topicLower.includes('climate change') || topicLower.includes('global warming') || topicLower.includes('environmental') || topicLower.includes('sustainability') || topicLower.includes('renewable energy') || topicLower.includes('carbon') || topicLower.includes('pollution')) {
+            return { type: 'current-events', subject: 'environmental', approach: 'evidence-based' };
+        }
+        if (topicLower.includes('technology') || topicLower.includes('ai') || topicLower.includes('artificial intelligence') || topicLower.includes('digital') || topicLower.includes('internet') || topicLower.includes('social media') || topicLower.includes('cybersecurity') || topicLower.includes('blockchain') || topicLower.includes('machine learning') || topicLower.includes('automation')) {
+            return { type: 'current-events', subject: 'technology', approach: 'innovative' };
+        }
+        if (topicLower.includes('health') || topicLower.includes('medical') || topicLower.includes('disease') || topicLower.includes('pandemic') || topicLower.includes('vaccine') || topicLower.includes('healthcare') || topicLower.includes('medicine') || topicLower.includes('public health')) {
+            return { type: 'current-events', subject: 'health', approach: 'medical' };
+        }
+        if (topicLower.includes('education') || topicLower.includes('learning') || topicLower.includes('teaching') || topicLower.includes('school') || topicLower.includes('university') || topicLower.includes('curriculum') || topicLower.includes('pedagogy') || topicLower.includes('student') || topicLower.includes('academic')) {
+            return { type: 'current-events', subject: 'education', approach: 'educational' };
+        }
+        
+        // Business and professional topics
+        if (topicLower.includes('business') || topicLower.includes('management') || topicLower.includes('marketing') || topicLower.includes('finance') || topicLower.includes('entrepreneurship') || topicLower.includes('startup') || topicLower.includes('corporate') || topicLower.includes('leadership') || topicLower.includes('strategy') || topicLower.includes('innovation')) {
+            return { type: 'professional', subject: 'business', approach: 'practical' };
+        }
+        if (topicLower.includes('law') || topicLower.includes('legal') || topicLower.includes('justice') || topicLower.includes('court') || topicLower.includes('constitution') || topicLower.includes('rights') || topicLower.includes('criminal') || topicLower.includes('civil law')) {
+            return { type: 'professional', subject: 'law', approach: 'legal-analysis' };
+        }
+        if (topicLower.includes('medicine') || topicLower.includes('medical') || topicLower.includes('healthcare') || topicLower.includes('clinical') || topicLower.includes('treatment') || topicLower.includes('diagnosis') || topicLower.includes('patient')) {
+            return { type: 'professional', subject: 'medicine', approach: 'clinical' };
+        }
+        
+        // Arts and culture
+        if (topicLower.includes('art') || topicLower.includes('painting') || topicLower.includes('sculpture') || topicLower.includes('music') || topicLower.includes('film') || topicLower.includes('cinema') || topicLower.includes('theater') || topicLower.includes('dance') || topicLower.includes('architecture') || topicLower.includes('design')) {
+            return { type: 'academic', subject: 'arts', approach: 'creative-analysis' };
+        }
+        
+        // Sports and recreation
+        if (topicLower.includes('sport') || topicLower.includes('athletic') || topicLower.includes('fitness') || topicLower.includes('exercise') || topicLower.includes('olympic') || topicLower.includes('team') || topicLower.includes('coaching')) {
+            return { type: 'general', subject: 'sports', approach: 'performance-based' };
+        }
+        
+        // Default for other topics
+        return { type: 'general', subject: 'general', approach: 'comprehensive' };
+    }
 
-Writing Guidelines:
-- Focus on detailed explanations and comprehensive coverage
-- Include specific examples, case studies, and real-world applications
-- Provide thorough analysis and multiple perspectives
-- Use academic depth with scholarly insights
-- Write substantial paragraphs with detailed supporting information
-- Include background context and relevant details
-- Expand on key concepts with elaborate explanations
+    // Generate assignment prompt based on user inputs with improved accuracy
+    generatePrompt(topic, wordCount, assignmentType = 'essay', customType = '') {
+        const analysis = this.analyzeTopic(topic);
+        
+        let specificInstructions = '';
+        let contentStructure = '';
+        
+        // Generate specific instructions based on topic analysis and assignment type
+        const assignmentInstructions = this.getAssignmentTypeInstructions(assignmentType, topic, customType);
+        
+        switch (analysis.type) {
+            case 'academic':
+                specificInstructions = this.getAcademicInstructions(analysis.subject, topic) + '\n\n' + assignmentInstructions;
+                contentStructure = this.getAssignmentTypeStructure(wordCount, assignmentType, analysis.subject, customType);
+                break;
+            case 'current-events':
+                specificInstructions = this.getCurrentEventsInstructions(analysis.subject, topic) + '\n\n' + assignmentInstructions;
+                contentStructure = this.getAssignmentTypeStructure(wordCount, assignmentType, analysis.subject, customType);
+                break;
+            case 'professional':
+                specificInstructions = this.getProfessionalInstructions(analysis.subject, topic) + '\n\n' + assignmentInstructions;
+                contentStructure = this.getAssignmentTypeStructure(wordCount, assignmentType, analysis.subject, customType);
+                break;
+            default:
+                specificInstructions = this.getGeneralInstructions(topic) + '\n\n' + assignmentInstructions;
+                contentStructure = this.getAssignmentTypeStructure(wordCount, assignmentType, analysis.subject, customType);
+        }
+
+        return `You are an expert academic writer with deep knowledge of ${analysis.subject}. Write a comprehensive, accurate, and well-researched piece about "${topic}".
+
+CRITICAL REQUIREMENTS:
+- Write EXACTLY ${wordCount} words (±5%)
+- Provide accurate, factual information with specific details
+- Include relevant examples, data, and evidence
+- Use proper academic tone and structure
+- Avoid vague or generic statements
+- Ensure all information is current and reliable
+
+${specificInstructions}
+
+CONTENT STRUCTURE (${wordCount} words total):
+${contentStructure}
+
+WRITING GUIDELINES:
+- Start with a compelling introduction that clearly states the topic
+- Use specific examples, statistics, and real-world applications
+- Include relevant background information and context
+- Provide detailed analysis and explanations
 - Use transitional phrases to connect ideas smoothly
+- End with a strong conclusion that summarizes key points
+- Maintain academic rigor while being engaging and accessible
 
-Please write comprehensive, detailed content with rich examples and thorough analysis.`;
+IMPORTANT: Focus specifically on "${topic}" - do not write about general concepts unless directly related to the topic. Every paragraph should directly address the topic with specific, relevant information.
 
-        const prompts = {
-            essay: `TASK: Write a ${wordCount}-word academic essay about "${topic}".
-
-${baseInstructions}
-
-CRITICAL INSTRUCTIONS FOR ESSAY WRITING:
-- You MUST write EXACTLY ${wordCount} words
-- Every sentence must be detailed and comprehensive
-- Include extensive examples, explanations, and analysis
-- Write long, elaborate paragraphs with multiple supporting points
-- Add background information, context, and detailed descriptions
-- Include specific examples, case studies, and real-world applications
-- Use transitional phrases and connecting sentences between ideas
-- Expand on every concept with thorough explanations
-
-ESSAY STRUCTURE (TOTAL: ${wordCount} words):
-
-1. INTRODUCTION (${Math.round(wordCount * 0.15)} words):
-   - Hook: Start with a compelling opening statement, question, or statistic
-   - Background: Provide essential context about ${topic}
-   - Thesis statement: Clear argument or main point about ${topic}
-   - Preview of main points that will be discussed
-
-2. BODY PARAGRAPHS (${Math.round(wordCount * 0.7)} words total - approximately 3-5 paragraphs):
-   Each paragraph should contain:
-   - Topic sentence introducing the main point
-   - Detailed explanation with specific examples
-   - Evidence, statistics, or expert opinions
-   - Analysis of how this relates to ${topic}
-   - Transition to the next point
-   
-   Cover multiple aspects of ${topic} such as:
-   - Historical background and development
-   - Current state and recent developments
-   - Different perspectives or viewpoints
-   - Causes and effects
-   - Implications and significance
-   - Real-world applications or examples
-
-3. CONCLUSION (${Math.round(wordCount * 0.15)} words):
-   - Restate thesis in new words
-   - Summarize key points discussed
-   - Broader implications for society/field
-   - Call to action or future considerations
-
-WRITING REQUIREMENTS:
-- Use formal academic language
-- Include specific examples and case studies
-- Reference real events, people, or studies when possible
-- Elaborate on every point with detailed explanations
-- Use sophisticated vocabulary and varied sentence structure
-- Ensure smooth transitions between ideas
-- Write ${wordCount} words exactly - no more, no less
-
-Write the complete essay now:
-
-Write a comprehensive, well-structured essay with detailed analysis and examples.`,
-
-            report: `You are creating a professional report on "${topic}". ${baseInstructions}
-
-REPORT STRUCTURE (Total: ${wordCount} words):
-
-1. EXECUTIVE SUMMARY (${Math.round(wordCount * 0.08)} words):
-   - Brief overview of ${topic}
-   - Key findings and recommendations
-   - Summary of main conclusions
-
-2. INTRODUCTION (${Math.round(wordCount * 0.12)} words):
-   - Purpose and scope of the report
-   - Background information on ${topic}
-   - Methodology or approach used
-
-3. BACKGROUND/CONTEXT (${Math.round(wordCount * 0.2)} words):
-   - Historical development of ${topic}
-   - Current situation and trends
-   - Key stakeholders and their roles
-   - Relevant regulations or standards
-
-4. DETAILED ANALYSIS/FINDINGS (${Math.round(wordCount * 0.4)} words):
-   - Comprehensive examination of ${topic}
-   - Data analysis and interpretation
-   - Multiple perspectives and viewpoints
-   - Challenges and opportunities
-   - Case studies and examples
-   - Statistical information and trends
-
-5. DISCUSSION (${Math.round(wordCount * 0.12)} words):
-   - Implications of findings
-   - Comparison with industry standards
-   - Risk assessment and mitigation
-
-6. CONCLUSIONS AND RECOMMENDATIONS (${Math.round(wordCount * 0.08)} words):
-   - Summary of key findings
-   - Actionable recommendations
-   - Future outlook
-
-Write a comprehensive, professional report with detailed analysis and supporting information.`,
-
-            summary: `Create a comprehensive summary of "${topic}". ${baseInstructions}
-
-SUMMARY STRUCTURE (Total: ${wordCount} words):
-
-1. OVERVIEW (${Math.round(wordCount * 0.2)} words):
-   - What is ${topic}?
-   - Why is it important?
-   - Main components or aspects
-
-2. KEY CONCEPTS AND IDEAS (${Math.round(wordCount * 0.4)} words):
-   - Fundamental principles of ${topic}
-   - Major theories or frameworks
-   - Important terminology and definitions
-   - Historical development and evolution
-
-3. DETAILED SUPPORTING INFORMATION (${Math.round(wordCount * 0.3)} words):
-   - Specific examples and case studies
-   - Statistical data and research findings
-   - Expert opinions and perspectives
-   - Real-world applications
-
-4. SIGNIFICANCE AND IMPLICATIONS (${Math.round(wordCount * 0.1)} words):
-   - Impact on society/industry/field
-   - Future trends and developments
-   - Broader implications
-
-Write a comprehensive, detailed summary with thorough explanations and examples.`,
-
-            analysis: `Conduct a thorough analysis of "${topic}". ${baseInstructions}
-
-ANALYSIS STRUCTURE (Total: ${wordCount} words):
-
-1. INTRODUCTION (${Math.round(wordCount * 0.15)} words):
-   - Define and introduce ${topic}
-   - Establish analytical framework
-   - Outline key questions to examine
-
-2. MULTIPLE ANALYTICAL PERSPECTIVES (${Math.round(wordCount * 0.5)} words):
-   Examine ${topic} from various angles:
-   - Historical perspective: How has ${topic} evolved?
-   - Social/Cultural perspective: What are the societal impacts?
-   - Economic perspective: What are the financial implications?
-   - Technical/Scientific perspective: What are the mechanisms?
-   - Political perspective: What are the policy implications?
-   - Environmental perspective: What are the ecological effects?
-
-3. CRITICAL EXAMINATION (${Math.round(wordCount * 0.25)} words):
-   - Strengths and weaknesses of ${topic}
-   - Controversies and debates
-   - Evidence supporting different viewpoints
-   - Gaps in current understanding
-
-4. SYNTHESIS AND CONCLUSIONS (${Math.round(wordCount * 0.1)} words):
-   - Integration of different perspectives
-   - Overall assessment of ${topic}
-   - Future research directions
-
-Write a comprehensive, analytical examination with deep insights and extensive evidence.`,
-
-            research: `Write a scholarly research paper on "${topic}". ${baseInstructions}
-
-RESEARCH PAPER STRUCTURE (Total: ${wordCount} words):
-
-1. ABSTRACT (${Math.round(wordCount * 0.05)} words):
-   - Concise summary of research
-   - Key findings and implications
-
-2. INTRODUCTION & LITERATURE REVIEW (${Math.round(wordCount * 0.25)} words):
-   - Background and significance of ${topic}
-   - Review of existing research
-   - Identification of research gaps
-   - Research questions and objectives
-
-3. METHODOLOGY (${Math.round(wordCount * 0.15)} words):
-   - Research approach and design
-   - Data collection methods
-   - Analysis techniques
-   - Limitations and considerations
-
-4. FINDINGS AND ANALYSIS (${Math.round(wordCount * 0.35)} words):
-   - Detailed presentation of results
-   - Data interpretation and analysis
-   - Relationship to existing literature
-   - Unexpected findings and insights
-
-5. DISCUSSION (${Math.round(wordCount * 0.12)} words):
-   - Implications of findings
-   - Theoretical contributions
-   - Practical applications
-   - Limitations and future research
-
-6. CONCLUSION (${Math.round(wordCount * 0.08)} words):
-   - Summary of key contributions
-   - Final thoughts and recommendations
-
-Write a comprehensive, scholarly research paper with extensive analysis and academic depth.`
-        };
-
-        return prompts[type] || prompts.essay;
+Write the complete ${wordCount}-word piece now:`;
     }
 
-    // Generate assignment in sections for better control
-    async generateAssignmentInSections(topic, type, wordCount) {
-        const sections = this.getSectionBreakdown(type, wordCount);
-        let fullText = "";
-        let totalWordsGenerated = 0;
-
-        for (const section of sections) {
-            const sectionPrompt = this.generateSectionPrompt(topic, type, section, wordCount);
+    // Get academic-specific instructions
+    getAcademicInstructions(subject, topic) {
+        const instructions = {
+            'history': `For this historical topic, include:
+- Specific dates, events, and historical figures
+- Primary and secondary source references where applicable
+- Historical context and significance
+- Cause-and-effect relationships
+- Impact on subsequent events or modern times`,
             
-            try {
-                const sectionText = await this.generateContent(sectionPrompt);
-                const sectionWords = sectionText.trim().split(/\s+/).length;
-                
-                fullText += sectionText + "\n\n";
-                totalWordsGenerated += sectionWords;
-                
-                console.log(`Generated ${section.name}: ${sectionWords} words (target: ~${section.words})`);
-                
-                // Small delay between sections to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-            } catch (error) {
-                console.error(`Error generating ${section.name}:`, error);
-                throw error;
-            }
-        }
-
-        console.log(`Total generated: ${totalWordsGenerated} words (target: ${wordCount})`);
-        
-        // If total is too short, expand the main body section
-        if (totalWordsGenerated < wordCount * 0.8) {
-            fullText = await this.expandContent(fullText, topic, type, wordCount - totalWordsGenerated);
-        }
-        
-        return fullText.trim();
-    }
-
-    // Get section breakdown based on assignment type
-    getSectionBreakdown(type, wordCount) {
-        const breakdowns = {
-            essay: [
-                { name: "Introduction", words: Math.round(wordCount * 0.15), description: "engaging introduction with thesis" },
-                { name: "Body Part 1", words: Math.round(wordCount * 0.25), description: "main arguments and analysis" },
-                { name: "Body Part 2", words: Math.round(wordCount * 0.25), description: "supporting evidence and examples" },
-                { name: "Body Part 3", words: Math.round(wordCount * 0.2), description: "additional perspectives and analysis" },
-                { name: "Conclusion", words: Math.round(wordCount * 0.15), description: "summary and final thoughts" }
-            ],
-            report: [
-                { name: "Executive Summary", words: Math.round(wordCount * 0.1), description: "brief overview and key findings" },
-                { name: "Introduction", words: Math.round(wordCount * 0.15), description: "background and purpose" },
-                { name: "Analysis Section 1", words: Math.round(wordCount * 0.25), description: "detailed analysis and findings" },
-                { name: "Analysis Section 2", words: Math.round(wordCount * 0.25), description: "additional analysis and data" },
-                { name: "Discussion", words: Math.round(wordCount * 0.15), description: "implications and interpretation" },
-                { name: "Conclusion", words: Math.round(wordCount * 0.1), description: "summary and recommendations" }
-            ],
-            analysis: [
-                { name: "Introduction", words: Math.round(wordCount * 0.15), description: "introduction to the analysis" },
-                { name: "Background Analysis", words: Math.round(wordCount * 0.2), description: "contextual background" },
-                { name: "Main Analysis", words: Math.round(wordCount * 0.35), description: "detailed analytical examination" },
-                { name: "Critical Evaluation", words: Math.round(wordCount * 0.2), description: "critical assessment and evaluation" },
-                { name: "Conclusion", words: Math.round(wordCount * 0.1), description: "synthesis and final thoughts" }
-            ]
+            'science': `For this scientific topic, include:
+- Scientific principles and theories
+- Research findings and studies
+- Experimental evidence and data
+- Real-world applications and implications
+- Current scientific understanding`,
+            
+            'mathematics': `For this mathematical topic, include:
+- Mathematical concepts and principles
+- Problem-solving approaches and methods
+- Real-world applications and examples
+- Historical development of the concept
+- Practical significance and usage`,
+            
+            'literature': `For this literary topic, include:
+- Textual analysis and interpretation
+- Literary devices and techniques used
+- Author's background and context
+- Critical perspectives and themes
+- Cultural and historical significance`,
+            
+            'philosophy': `For this philosophical topic, include:
+- Philosophical arguments and theories
+- Key thinkers and their contributions
+- Logical reasoning and analysis
+- Different perspectives and viewpoints
+- Contemporary relevance and implications`,
+            
+            'economics': `For this economic topic, include:
+- Economic principles and theories
+- Statistical data and trends
+- Market analysis and factors
+- Policy implications and effects
+- Real-world economic examples`,
+            
+            'psychology': `For this psychological topic, include:
+- Psychological theories and research
+- Experimental studies and findings
+- Behavioral and cognitive aspects
+- Clinical or practical applications
+- Current psychological understanding`,
+            
+            'sociology': `For this sociological topic, include:
+- Social theories and perspectives
+- Research studies and data
+- Cultural and societal factors
+- Group dynamics and interactions
+- Social implications and consequences`,
+            
+            'geography': `For this geographical topic, include:
+- Spatial relationships and patterns
+- Environmental factors and processes
+- Human-environment interactions
+- Regional characteristics and differences
+- Geographic data and mapping`,
+            
+            'political-science': `For this political science topic, include:
+- Political theories and ideologies
+- Government structures and processes
+- Policy analysis and implications
+- International relations and diplomacy
+- Political behavior and participation`,
+            
+            'arts': `For this arts topic, include:
+- Artistic techniques and methods
+- Historical context and influences
+- Cultural significance and meaning
+- Critical analysis and interpretation
+- Contemporary relevance and impact`
         };
-
-        // Default to essay structure if type not found
-        return breakdowns[type] || breakdowns.essay;
+        
+        return instructions[subject] || `Provide comprehensive academic analysis with:
+- Theoretical frameworks and concepts
+- Research evidence and studies
+- Critical analysis and evaluation
+- Practical applications and implications
+- Current state of knowledge in the field`;
     }
 
-    // Generate prompt for a specific section
-    generateSectionPrompt(topic, type, section, totalWordCount) {
-        return `Write the ${section.name} section of a ${type} about "${topic}".
-
-This section should be approximately ${section.words} words and focus on: ${section.description}.
-
-Requirements:
-- Write detailed, comprehensive content with specific examples
-- Include relevant analysis and supporting information
-- Use academic language appropriate for a ${totalWordCount}-word ${type}
-- Provide substantial detail without summarizing too briefly
-- Include specific facts, examples, or case studies where relevant
-
-Write only this section (${section.name}) with approximately ${section.words} words:`;
+    // Get current events instructions
+    getCurrentEventsInstructions(subject, topic) {
+        const instructions = {
+            'environmental': `For this environmental topic, include:
+- Current environmental data and statistics
+- Scientific consensus and research findings
+- Policy responses and international agreements
+- Economic and social impacts
+- Future projections and solutions`,
+            
+            'technology': `For this technology topic, include:
+- Current technological developments and trends
+- Innovation and breakthrough technologies
+- Industry applications and market impact
+- Ethical considerations and challenges
+- Future implications and predictions`,
+            
+            'politics': `For this political topic, include:
+- Current political developments and events
+- Policy analysis and implications
+- Stakeholder perspectives and interests
+- Historical context and precedents
+- Future political implications`,
+            
+            'health': `For this health topic, include:
+- Current health data and statistics
+- Medical research and clinical findings
+- Public health implications and policies
+- Treatment options and prevention strategies
+- Future health considerations`,
+            
+            'education': `For this education topic, include:
+- Current educational trends and developments
+- Learning methodologies and technologies
+- Student performance and outcomes
+- Educational policy and reform
+- Future of education and learning`
+        };
+        
+        return instructions[subject] || `Provide current, accurate information with:
+- Recent developments and trends
+- Factual data and statistics
+- Multiple perspectives and viewpoints
+- Real-world implications and effects
+- Future outlook and considerations`;
     }
 
-    // Expand content if it's too short
-    async expandContent(existingText, topic, type, additionalWords) {
-        const expansionPrompt = `The following ${type} about "${topic}" needs to be expanded by approximately ${additionalWords} more words.
+    // Get professional instructions
+    getProfessionalInstructions(subject, topic) {
+        const instructions = {
+            'business': `For this business topic, include:
+- Industry trends and market analysis
+- Business strategies and best practices
+- Case studies and real-world examples
+- Economic factors and market conditions
+- Future business implications`,
+            
+            'education': `For this education topic, include:
+- Current educational practices and policies
+- Learning theories and methodologies
+- Student outcomes and assessment data
+- Educational technology and innovation
+- Future educational trends and challenges`,
+            
+            'law': `For this legal topic, include:
+- Legal principles and precedents
+- Case law and judicial decisions
+- Statutory frameworks and regulations
+- Legal analysis and interpretation
+- Practical implications and applications`,
+            
+            'medicine': `For this medical topic, include:
+- Medical principles and practices
+- Clinical evidence and research
+- Treatment protocols and guidelines
+- Patient care and outcomes
+- Healthcare systems and policies`
+        };
+        
+        return instructions[subject] || `Provide professional analysis with:
+- Industry-specific knowledge and expertise
+- Practical applications and case studies
+- Best practices and recommendations
+- Current trends and developments
+- Professional implications and considerations`;
+    }
 
-Current text:
-${existingText}
+    // Get general instructions
+    getGeneralInstructions(topic) {
+        const instructions = {
+            'sports': `For this sports topic, include:
+- Performance analysis and statistics
+- Training methods and techniques
+- Historical context and achievements
+- Current trends and developments
+- Impact on society and culture`,
+            
+            'general': `Provide comprehensive coverage of "${topic}" including:
+- Key concepts and definitions
+- Important facts and information
+- Relevant examples and applications
+- Current understanding and developments
+- Practical significance and implications`
+        };
+        
+        return instructions['general'];
+    }
 
-Please add ${additionalWords} more words by:
-- Expanding existing paragraphs with more detailed explanations
-- Adding specific examples and case studies
-- Including additional analysis and supporting information
-- Providing more background context where appropriate
+    // Get general instructions
+    getGeneralInstructions(topic) {
+        return `Provide comprehensive coverage of "${topic}" including:
+- Key concepts and definitions
+- Important facts and information
+- Relevant examples and applications
+- Current understanding and developments
+- Practical significance and implications`;
+    }
 
-Add the additional content naturally throughout the text:`;
+    // Get assignment type specific instructions
+    getAssignmentTypeInstructions(assignmentType, topic, customType = '') {
+        const instructions = {
+            'essay': `Write this as a formal academic essay about "${topic}":
+- Present a clear thesis statement
+- Develop coherent arguments with supporting evidence
+- Use logical structure and flow
+- Include critical analysis and evaluation
+- Conclude with synthesis of main points`,
+            
+            'report': `Write this as a comprehensive report about "${topic}":
+- Include executive summary or overview
+- Present findings in organized sections
+- Use data, statistics, and evidence
+- Provide clear recommendations
+- Use professional, objective tone`,
+            
+            'analysis': `Write this as a detailed analysis of "${topic}":
+- Break down complex concepts systematically
+- Examine multiple perspectives and viewpoints
+- Provide in-depth examination of key aspects
+- Include critical evaluation and assessment
+- Draw conclusions based on analysis`,
+            
+            'research': `Write this as a research paper about "${topic}":
+- Include literature review and background
+- Present research methodology and findings
+- Use academic citations and references
+- Provide comprehensive discussion
+- Include implications for future research`,
+            
+            'summary': `Write this as a comprehensive summary of "${topic}":
+- Condense key information and main points
+- Maintain accuracy and completeness
+- Organize information logically
+- Highlight most important aspects
+- Provide clear overview for readers`,
+            
+            'discussion': `Write this as a discussion piece about "${topic}":
+- Explore different viewpoints and perspectives
+- Encourage critical thinking and debate
+- Present balanced arguments
+- Consider implications and consequences
+- Engage readers in thoughtful consideration`,
+            
+            'case-study': `Write this as a case study about "${topic}":
+- Present detailed examination of specific example
+- Include background context and situation
+- Analyze key factors and outcomes
+- Draw lessons and insights
+- Provide practical applications`,
+            
+            'literature-review': `Write this as a literature review about "${topic}":
+- Survey existing research and literature
+- Identify key themes and trends
+- Evaluate strengths and limitations
+- Identify gaps in current knowledge
+- Suggest directions for future research`,
+            
+            'other': `Write this as a ${customType} about "${topic}":
+- Follow the specific format and style appropriate for ${customType}
+- Adapt the content structure to match ${customType} requirements
+- Use appropriate tone and language for ${customType}
+- Include relevant elements and features typical of ${customType}
+- Ensure the content meets the expectations and standards of ${customType}`
+        };
+        
+        return instructions[assignmentType] || instructions['essay'];
+    }
+
+    // Get academic content structure
+    getAcademicStructure(wordCount, subject) {
+        const intro = Math.round(wordCount * 0.15);
+        const body = Math.round(wordCount * 0.7);
+        const conclusion = Math.round(wordCount * 0.15);
+        
+        return `1. INTRODUCTION (${intro} words):
+   - Clear topic definition and scope
+   - Background context and significance
+   - Thesis statement or main argument
+   - Preview of key points to be discussed
+
+2. MAIN BODY (${body} words) - 3-4 detailed sections:
+   - Section 1: Core concepts and theoretical framework
+   - Section 2: Evidence, research, and supporting data
+   - Section 3: Analysis, interpretation, and critical evaluation
+   - Section 4: Applications, implications, and real-world relevance
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of key findings and arguments
+   - Synthesis of main points
+   - Broader implications and significance
+   - Future considerations or recommendations`;
+    }
+
+    // Get current events structure
+    getCurrentEventsStructure(wordCount, subject) {
+        const intro = Math.round(wordCount * 0.15);
+        const body = Math.round(wordCount * 0.7);
+        const conclusion = Math.round(wordCount * 0.15);
+        
+        return `1. INTRODUCTION (${intro} words):
+   - Current situation and context
+   - Why this topic is important now
+   - Key issues and challenges
+   - Preview of analysis to follow
+
+2. MAIN BODY (${body} words) - 3-4 comprehensive sections:
+   - Section 1: Current state and recent developments
+   - Section 2: Causes, factors, and contributing elements
+   - Section 3: Impacts and consequences
+   - Section 4: Responses, solutions, and future outlook
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of current situation
+   - Key insights and implications
+   - Future projections and recommendations
+   - Broader significance and lessons learned`;
+    }
+
+    // Get professional structure
+    getProfessionalStructure(wordCount, subject) {
+        const intro = Math.round(wordCount * 0.15);
+        const body = Math.round(wordCount * 0.7);
+        const conclusion = Math.round(wordCount * 0.15);
+        
+        return `1. INTRODUCTION (${intro} words):
+   - Topic overview and business context
+   - Current challenges and opportunities
+   - Scope and objectives of analysis
+   - Preview of key insights
+
+2. MAIN BODY (${body} words) - 3-4 detailed sections:
+   - Section 1: Current landscape and trends
+   - Section 2: Analysis of key factors and drivers
+   - Section 3: Best practices and successful strategies
+   - Section 4: Future outlook and recommendations
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of key findings
+   - Strategic implications and recommendations
+   - Action items and next steps
+   - Long-term considerations`;
+    }
+
+    // Get general structure
+    getGeneralStructure(wordCount) {
+        const intro = Math.round(wordCount * 0.15);
+        const body = Math.round(wordCount * 0.7);
+        const conclusion = Math.round(wordCount * 0.15);
+        
+        return `1. INTRODUCTION (${intro} words):
+   - Topic introduction and definition
+   - Importance and relevance
+   - Scope of discussion
+   - Preview of main points
+
+2. MAIN BODY (${body} words) - 3-4 comprehensive sections:
+   - Section 1: Core concepts and fundamentals
+   - Section 2: Detailed analysis and exploration
+   - Section 3: Examples and applications
+   - Section 4: Implications and significance
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of key points
+   - Synthesis of main ideas
+   - Broader implications
+   - Final thoughts and considerations`;
+    }
+
+    // Get assignment type specific structure
+    getAssignmentTypeStructure(wordCount, assignmentType, subject, customType = '') {
+        const intro = Math.round(wordCount * 0.15);
+        const body = Math.round(wordCount * 0.7);
+        const conclusion = Math.round(wordCount * 0.15);
+        
+        const structures = {
+            'essay': `1. INTRODUCTION (${intro} words):
+   - Hook and background context
+   - Clear thesis statement
+   - Preview of main arguments
+   - Scope and approach
+
+2. MAIN BODY (${body} words) - 3-4 argumentative sections:
+   - Section 1: First main argument with evidence
+   - Section 2: Second main argument with evidence
+   - Section 3: Third main argument with evidence
+   - Section 4: Counterarguments and rebuttals
+
+3. CONCLUSION (${conclusion} words):
+   - Restate thesis in new words
+   - Summarize key arguments
+   - Broader implications
+   - Final thoughts and call to action`,
+            
+            'report': `1. EXECUTIVE SUMMARY (${Math.round(intro * 0.6)} words):
+   - Key findings and recommendations
+   - Brief overview of content
+
+2. INTRODUCTION (${Math.round(intro * 0.4)} words):
+   - Purpose and objectives
+   - Scope and methodology
+   - Background context
+
+3. MAIN BODY (${body} words) - 4-5 detailed sections:
+   - Section 1: Background and context
+   - Section 2: Methodology and approach
+   - Section 3: Findings and results
+   - Section 4: Analysis and interpretation
+   - Section 5: Implications and significance
+
+4. CONCLUSION (${conclusion} words):
+   - Summary of key findings
+   - Recommendations and next steps
+   - Limitations and future considerations`,
+            
+            'analysis': `1. INTRODUCTION (${intro} words):
+   - Topic overview and significance
+   - Analysis framework and approach
+   - Key questions to be addressed
+   - Preview of analysis structure
+
+2. MAIN BODY (${body} words) - 4-5 analytical sections:
+   - Section 1: Context and background analysis
+   - Section 2: Detailed examination of key aspects
+   - Section 3: Comparative analysis and perspectives
+   - Section 4: Critical evaluation and assessment
+   - Section 5: Synthesis and integration
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of analytical findings
+   - Key insights and conclusions
+   - Implications and recommendations
+   - Areas for further analysis`,
+            
+            'research': `1. INTRODUCTION (${intro} words):
+   - Research problem and significance
+   - Literature review summary
+   - Research questions and objectives
+   - Methodology overview
+
+2. MAIN BODY (${body} words) - 5-6 comprehensive sections:
+   - Section 1: Literature review and theoretical framework
+   - Section 2: Research methodology and design
+   - Section 3: Data collection and analysis
+   - Section 4: Results and findings
+   - Section 5: Discussion and interpretation
+   - Section 6: Implications and applications
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of research contributions
+   - Limitations and future research directions
+   - Practical implications and recommendations`,
+            
+            'summary': `1. INTRODUCTION (${intro} words):
+   - Topic overview and scope
+   - Purpose of summary
+   - Key themes to be covered
+   - Organization of content
+
+2. MAIN BODY (${body} words) - 3-4 summary sections:
+   - Section 1: Key concepts and definitions
+   - Section 2: Main points and findings
+   - Section 3: Important details and examples
+   - Section 4: Implications and significance
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of main points
+   - Key takeaways and insights
+   - Broader context and significance`,
+            
+            'discussion': `1. INTRODUCTION (${intro} words):
+   - Topic introduction and context
+   - Discussion framework and approach
+   - Key issues to be explored
+   - Multiple perspectives to be considered
+
+2. MAIN BODY (${body} words) - 4-5 discussion sections:
+   - Section 1: Background and context
+   - Section 2: First perspective or viewpoint
+   - Section 3: Second perspective or viewpoint
+   - Section 4: Third perspective or viewpoint
+   - Section 5: Synthesis and integration
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of discussion points
+   - Balanced conclusions and insights
+   - Implications and recommendations
+   - Areas for further discussion`,
+            
+            'case-study': `1. INTRODUCTION (${intro} words):
+   - Case study overview and context
+   - Key issues and questions
+   - Methodology and approach
+   - Structure and organization
+
+2. MAIN BODY (${body} words) - 4-5 detailed sections:
+   - Section 1: Background and context
+   - Section 2: Case description and situation
+   - Section 3: Analysis of key factors
+   - Section 4: Outcomes and results
+   - Section 5: Lessons and insights
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of case study findings
+   - Key lessons and implications
+   - Recommendations and applications
+   - Broader significance and relevance`,
+            
+            'literature-review': `1. INTRODUCTION (${intro} words):
+   - Research area and scope
+   - Review objectives and approach
+   - Key themes and questions
+   - Organization and structure
+
+2. MAIN BODY (${body} words) - 4-5 thematic sections:
+   - Section 1: Historical development and background
+   - Section 2: Current state of research
+   - Section 3: Key findings and contributions
+   - Section 4: Gaps and limitations
+   - Section 5: Future directions and opportunities
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of literature review
+   - Key themes and trends
+   - Research gaps and opportunities
+   - Implications for future research`
+        };
+        
+        if (assignmentType === 'other' && customType) {
+            return `1. INTRODUCTION (${intro} words):
+   - Topic introduction and context
+   - Purpose and scope of the ${customType}
+   - Key elements to be covered
+   - Preview of main content
+
+2. MAIN BODY (${body} words) - 3-4 comprehensive sections:
+   - Section 1: Core content and main points
+   - Section 2: Detailed exploration and development
+   - Section 3: Examples, applications, or analysis
+   - Section 4: Additional insights and perspectives
+
+3. CONCLUSION (${conclusion} words):
+   - Summary of key points
+   - Final thoughts and insights
+   - Broader implications or applications
+   - Closing remarks appropriate for ${customType}`;
+        }
+        
+        return structures[assignmentType] || structures['essay'];
+    }
+
+    // Generate assignment with improved accuracy
+    async generateAssignment(topic, wordCount, assignmentType = 'essay', customType = '') {
+        const prompt = this.generatePrompt(topic, wordCount, assignmentType, customType);
+        
+        try {
+            const generatedText = await this.generateContent(prompt);
+            
+            // Validate the generated content
+            const wordCountGenerated = generatedText.trim().split(/\s+/).length;
+            const accuracy = this.validateContentAccuracy(generatedText, topic);
+            
+            console.log(`Generated ${wordCountGenerated} words (target: ${wordCount})`);
+            console.log(`Content accuracy score: ${accuracy.score}/10`);
+            const assignmentTypeText = assignmentType === 'other' ? customType : assignmentType;
+            console.log(`Assignment type: ${assignmentTypeText}`);
+            
+            // If content is too short or inaccurate, try to improve it
+            if (wordCountGenerated < wordCount * 0.8 || accuracy.score < 7) {
+                console.log('Content needs improvement, attempting enhancement...');
+                return await this.improveContent(generatedText, topic, wordCount, assignmentType, customType);
+            }
+            
+            return generatedText;
+        } catch (error) {
+            console.error('Error generating assignment:', error);
+            throw error;
+        }
+    }
+
+    // Validate content accuracy and relevance
+    validateContentAccuracy(content, topic) {
+        const topicWords = topic.toLowerCase().split(/\s+/);
+        const contentLower = content.toLowerCase();
+        
+        let relevanceScore = 0;
+        let specificityScore = 0;
+        let structureScore = 0;
+        
+        // Check topic relevance
+        topicWords.forEach(word => {
+            if (contentLower.includes(word)) {
+                relevanceScore += 1;
+            }
+        });
+        relevanceScore = (relevanceScore / topicWords.length) * 5;
+        
+        // Check for specific details (numbers, dates, names)
+        const specificDetails = (content.match(/\d+/g) || []).length;
+        const properNouns = (content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || []).length;
+        specificityScore = Math.min(5, (specificDetails + properNouns) / 10);
+        
+        // Check structure
+        const hasIntro = contentLower.includes('introduction') || contentLower.includes('introducing');
+        const hasConclusion = contentLower.includes('conclusion') || contentLower.includes('concluding');
+        const hasSections = (content.match(/\n\n/g) || []).length >= 3;
+        structureScore = (hasIntro ? 1 : 0) + (hasConclusion ? 1 : 0) + (hasSections ? 3 : 0);
+        
+        return {
+            score: Math.round((relevanceScore + specificityScore + structureScore) / 3),
+            relevance: relevanceScore,
+            specificity: specificityScore,
+            structure: structureScore
+        };
+    }
+
+    // Improve content if it's not accurate enough
+    async improveContent(existingContent, topic, targetWordCount, assignmentType = 'essay', customType = '') {
+        const assignmentTypeText = assignmentType === 'other' ? customType : assignmentType;
+        const improvementPrompt = `The following content about "${topic}" needs improvement. Please rewrite it to be more accurate, specific, and comprehensive.
+
+Current content:
+${existingContent}
+
+IMPROVEMENT REQUIREMENTS:
+- Make the content more specific to "${topic}"
+- Add concrete examples, data, and evidence
+- Ensure all information is accurate and current
+- Improve the structure and flow
+- Target approximately ${targetWordCount} words
+- Focus on providing detailed, relevant information about "${topic}"
+- Follow the format and style appropriate for a ${assignmentTypeText}
+
+Rewrite the entire content with these improvements:`;
 
         try {
-            const expansion = await this.generateContent(expansionPrompt);
-            return expansion;
+            const improvedContent = await this.generateContent(improvementPrompt);
+            return improvedContent;
         } catch (error) {
-            console.error('Error expanding content:', error);
-            return existingText;
+            console.error('Error improving content:', error);
+            return existingContent;
         }
     }
 
-    // Make API call to Gemini
+    // Make API call to Gemini with improved parameters
     async generateContent(prompt) {
         if (!this.apiKey) {
             throw new Error('Please enter your Gemini API key');
@@ -360,11 +820,29 @@ Add the additional content naturally throughout the text:`;
                 }]
             }],
             generationConfig: {
-                temperature: 0.9,
+                temperature: 0.7, // Reduced for more consistent output
                 topK: 40,
-                topP: 0.95,
-                maxOutputTokens: 32768, // Allow much longer content
-            }
+                topP: 0.9,
+                maxOutputTokens: 32768,
+            },
+            safetySettings: [
+                {
+                    category: "HARM_CATEGORY_HARASSMENT",
+                    threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                },
+                {
+                    category: "HARM_CATEGORY_HATE_SPEECH",
+                    threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                },
+                {
+                    category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                },
+                {
+                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                }
+            ]
         };
 
         try {
@@ -445,7 +923,7 @@ Add the additional content naturally throughout the text:`;
 // Initialize Gemini generator
 const geminiGenerator = new GeminiAssignmentGenerator();
 
-// Main function to generate assignment
+// Main function to generate assignment with improved accuracy
 async function generateAssignment() {
     try {
         // Clear any previous errors
@@ -453,9 +931,9 @@ async function generateAssignment() {
         
         // Get user inputs
         const topic = document.getElementById('topicField').value.trim();
-        const type = document.getElementById('assignmentType').value;
-        const wordCount = document.getElementById('wordCount').value;
-        
+        const assignmentType = document.getElementById('assignmentType').value || 'essay';
+        const customType = document.getElementById('customTypeField')?.value?.trim() || '';
+        const wordCount = parseInt(document.getElementById('wordCount').value) || 1000;
         const apiKey = document.getElementById('apiKey').value.trim();
 
         // Validation
@@ -464,23 +942,34 @@ async function generateAssignment() {
             return;
         }
 
+        if (assignmentType === 'other' && !customType) {
+            geminiGenerator.showError('Please enter a custom assignment type');
+            return;
+        }
+
         if (!apiKey) {
             geminiGenerator.showError('Please enter your Gemini API key');
+            return;
+        }
+
+        if (wordCount < 100 || wordCount > 10000) {
+            geminiGenerator.showError('Word count must be between 100 and 10,000');
             return;
         }
 
         // Save API key
         geminiGenerator.saveApiKey(apiKey);
 
-        // Show section generation progress
+        // Show loading state
         geminiGenerator.showLoading(true);
         const loadingDiv = document.getElementById('loadingIndicator');
         if (loadingDiv) {
-            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Generating assignment sections...';
+            const assignmentTypeText = assignmentType === 'other' ? customType : assignmentType;
+            loadingDiv.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Analyzing topic and generating ${assignmentTypeText}...`;
         }
 
-        // Use chunked generation for better results
-        const generatedText = await geminiGenerator.generateAssignmentInSections(topic, type, wordCount);
+        // Generate assignment with improved accuracy
+        const generatedText = await geminiGenerator.generateAssignment(topic, wordCount, assignmentType, customType);
         
         // Log final word count
         const finalWordCount = generatedText.trim().split(/\s+/).length;
@@ -490,7 +979,8 @@ async function generateAssignment() {
         await processGeneratedAssignmentWithTypewriter(generatedText);
 
         // Show success message
-        showSuccessMessage('Assignment generated successfully!');
+        const assignmentTypeText = assignmentType === 'other' ? customType : assignmentType;
+        showSuccessMessage(`${assignmentTypeText.charAt(0).toUpperCase() + assignmentTypeText.slice(1)} generated successfully with improved accuracy!`);
 
     } catch (error) {
         console.error('Generation error:', error);
@@ -691,6 +1181,23 @@ function clearGenerationForm() {
     const topicField = document.getElementById('topicField');
     if (topicField) {
         topicField.value = '';
+    }
+}
+
+// Toggle custom assignment type input
+function toggleCustomType() {
+    const assignmentType = document.getElementById('assignmentType').value;
+    const customContainer = document.getElementById('customTypeContainer');
+    const customField = document.getElementById('customTypeField');
+    
+    if (assignmentType === 'other') {
+        customContainer.classList.remove('hidden');
+        customField.required = true;
+        customField.focus();
+    } else {
+        customContainer.classList.add('hidden');
+        customField.required = false;
+        customField.value = '';
     }
 }
 

@@ -75,14 +75,30 @@
                         
                         <!-- Assignment Type -->
                         <div>
-                            <label for="assignmentType" class="block text-sm font-medium text-gray-800 mb-2">Type</label>
-                            <select id="assignmentType" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                            <label for="assignmentType" class="block text-sm font-medium text-gray-800 mb-2">Assignment Type</label>
+                            <select id="assignmentType" 
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    onchange="toggleCustomType()">
                                 <option value="essay">Essay</option>
                                 <option value="report">Report</option>
-                                <option value="summary">Summary</option>
                                 <option value="analysis">Analysis</option>
                                 <option value="research">Research Paper</option>
+                                <option value="summary">Summary</option>
+                                <option value="discussion">Discussion</option>
+                                <option value="case-study">Case Study</option>
+                                <option value="literature-review">Literature Review</option>
+                                <option value="other">Other (Custom)</option>
                             </select>
+                        </div>
+                        
+                        <!-- Custom Assignment Type Input (hidden by default) -->
+                        <div id="customTypeContainer" class="hidden">
+                            <label for="customTypeField" class="block text-sm font-medium text-gray-800 mb-2">Custom Assignment Type *</label>
+                            <input type="text" 
+                                   id="customTypeField" 
+                                   placeholder="e.g., Creative Writing, Technical Manual, Blog Post..." 
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
                         </div>
                         
                         <!-- Word Count -->
