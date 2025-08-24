@@ -11,14 +11,21 @@
             --color-primary-darkest: #f53b57;
         }
     </style>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-    <link rel="stylesheet" href="assets/css/normalize.css">
-    <script src="https://imlolman.github.io/js/controller.js"></script>
-    <link rel="stylesheet" href="assets/css/milligram.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <link href="assets/css/fa/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="assets/css/legacy.css">
     <link rel="manifest" href="manifest.json">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142979168-1"></script> 
     <script>
@@ -30,76 +37,223 @@
         gtag('config', '{{ site.google_analytics }}');
     </script>
 </head>
-<body>
-    <main class="wrapper">
-        <nav class="navigation nav-top">
-            <section class="container">
-                <a class="navigation-title" href="/">
-                    <img src="assets/images/logo.svg" class="logo">
-                    &nbsp;
-                    <h1 class="title">Assignment Express</h1>
-                </a>
-                <ul class="navigation-list float-right">
-                    <li class="navigation-item">
-                        <label class="switch">
-                            <input type="checkbox" id="darkmode" onclick='darkLightToggle()'>
-                            <span class="slider"></span>
-                        </label>
-                    </li>
-                </ul>
-            </section>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img src="assets/images/logo.svg" class="h-8 w-8" alt="Assignment Express Logo">
+                    <h1 class="text-xl font-bold text-gray-900">Assignment Express</h1>
+                </div>
+                <!-- Dark mode toggle removed per user request -->
+            </div>
+        </div>
         </nav>
-        <section class="container">
-            <h3>Write Text 😅</h3><br>
-            <form onsubmit="return false">
-                <fieldset>
-                    <textarea placeholder="Enter Text You want to be written a paper...." id="dataField" onkeyup="myData = this.value"></textarea>
-                </fieldset>
-                <input class="button-primary button-large download-image hidden" type="file" id="pageUploader">
-                <input class="button-primary button-large download-image hidden" type="file" id="fontUploader">
-                <div class="row">
-                    <button class="column button-primary button-large inline-btn" id="btnPageUpload">Upload Page</button>
-                    <button class="column button-primary button-large inline-btn" onclick="loadPage()">Default Page</button>
-                    <button class="column button-primary button-large inline-btn" onclick="changeFont()">Switch Font</button>
-                    <button class="column button-primary button-large inline-btn" id="btnFontUpload" onclick="uploadFont()">Upload Your Font</button>
-                    <button class="column button-primary button-large download-image inline-btn" onclick="save(str(pageNum++))">Download Page</button>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- AI Assignment Generation Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg mb-6">
+            <div class="px-6 py-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">🤖 AI Assignment Generator</h2>
+                    <p class="text-blue-100">Generate comprehensive assignments instantly</p>
                 </div>
-                <div class="row">
-                    <div class="column">
-                        <label>Adjust X axis</label>
-                        <input type="range" min="1" max="200" value="20" oninput="xaxis=float(this.value)" class="slider">
+                
+                <div class="bg-white/95 backdrop-blur rounded-lg p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Topic Input -->
+                        <div>
+                            <label for="topicField" class="block text-sm font-medium text-gray-800 mb-2">Topic *</label>
+                            <input type="text" 
+                                   id="topicField" 
+                                   placeholder="e.g., Climate Change Effects..." 
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                   required>
+                        </div>
+                        
+                        <!-- Assignment Type -->
+                        <div>
+                            <label for="assignmentType" class="block text-sm font-medium text-gray-800 mb-2">Type</label>
+                            <select id="assignmentType" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="essay">Essay</option>
+                                <option value="report">Report</option>
+                                <option value="summary">Summary</option>
+                                <option value="analysis">Analysis</option>
+                                <option value="research">Research Paper</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Word Count -->
+                        <div>
+                            <label for="wordCount" class="block text-sm font-medium text-gray-800 mb-2">Word Count</label>
+                            <input type="number" 
+                                   id="wordCount" 
+                                   placeholder="Enter word count (e.g. 1500)" 
+                                   value="1000"
+                                   min="100"
+                                   max="10000"
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
                     </div>
-                    <div class="column">
-                        <label>Adjust Y axis</label>
-                        <input type="range" min="1" max="200" value="20" oninput="yaxis=float(this.value)" class="slider">
-                    </div>
-                    <div class="column">
-                        <label>Font Size</label>
-                        <input type="range" min="1" max="100" value="30" oninput="fontsize=float(this.value)" class="slider">
-                    </div>
-                    <div class="column">
-                        <label>Width</label>
-                        <input type="range" min="100" max="800" value="700" oninput="w=float(this.value)" class="slider">
+                    
+                    <!-- API Key -->
+                    <div class="mt-4">
+                        <label for="apiKey" class="block text-sm font-medium text-gray-800 mb-2">Gemini API Key *</label>
+                        <div class="flex gap-2">
+                            <input type="password" 
+                                   id="apiKey" 
+                                   placeholder="Enter your API key..." 
+                                   class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                   required>
+                            <button type="button" 
+                                    id="generateBtn" 
+                                    onclick="generateAssignment()" 
+                                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+                                <i class="fas fa-magic mr-1"></i> Generate
+                            </button>
+                        </div>
+                        <div id="loadingIndicator" class="hidden mt-2 text-white text-sm">
+                            <i class="fas fa-spinner fa-spin mr-1"></i>
+                            Generating assignment...
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="column">
-                        <label>Line Spacing</label>
-                        <input type="range" min="10" max="50" value="30" oninput="linespacing=float(this.value)" class="slider" step="0.01">
+            </div>
+        </div>
+
+        <!-- Split Layout: Settings Panel + Paper Preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Settings Panel -->
+            <div class="lg:col-span-1 space-y-4">
+                <!-- Text Input -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold mb-3">📝 Text Input</h3>
+                    <textarea 
+                        id="dataField" 
+                        onkeyup="updateManualText(this.value)"
+                        oninput="updateManualText(this.value)"
+                        placeholder="Generated text will appear here..." 
+                        rows="6"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-y"></textarea>
+                </div>
+
+                <!-- Page Controls -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold mb-3">📄 Pages</h3>
+                    <div class="flex items-center justify-between mb-3">
+                        <button id="prevPageBtn" onclick="navigatePage(-1)" 
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-xs py-1 px-2 rounded flex items-center">
+                            <i class="fas fa-chevron-left mr-1"></i>Prev
+                        </button>
+                        <span id="pageIndicator" class="text-sm font-medium">Page 1 of 1</span>
+                        <button id="nextPageBtn" onclick="navigatePage(1)" 
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-xs py-1 px-2 rounded flex items-center">
+                            Next<i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="addNewPage()" class="bg-green-600 hover:bg-green-700 text-white text-xs py-1 px-2 rounded flex-1">
+                            <i class="fas fa-plus mr-1"></i>Add
+                        </button>
+                        <button onclick="deletePage()" class="bg-red-600 hover:bg-red-700 text-white text-xs py-1 px-2 rounded flex-1">
+                            <i class="fas fa-trash mr-1"></i>Del
+                        </button>
+                        <button onclick="downloadAllPages()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs py-1 px-2 rounded flex-1">
+                            <i class="fas fa-download mr-1"></i>All
+                        </button>
                     </div>
                 </div>
-            </form>
-            <div id="contributing"></div>
-        </section>
-        <footer class="footer">
-            <section class="container">
-                <p>Designed with ♥ by <a target="_blank" href="https://github.com/UtkarshxDD" title="utkarsh">Utkarsh Singh</a></p>
-            </section>
-        </footer>
+
+                <!-- Formatting Controls -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold mb-3">🔧 Format</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="xAxisSlider" class="block text-xs font-medium text-gray-700 mb-1">X Position: <span id="xValue">50</span></label>
+                            <input type="range" min="1" max="200" value="50" oninput="updateXAxis(this.value)" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="xAxisSlider">
+                        </div>
+                        <div>
+                            <label for="yAxisSlider" class="block text-xs font-medium text-gray-700 mb-1">Y Position: <span id="yValue">80</span></label>
+                            <input type="range" min="1" max="200" value="80" oninput="updateYAxis(this.value)" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="yAxisSlider">
+                        </div>
+                        <div>
+                            <label for="fontSizeSlider" class="block text-xs font-medium text-gray-700 mb-1">Font Size: <span id="fontSizeValue">18</span></label>
+                            <input type="range" min="10" max="100" value="18" oninput="updateFontSize(this.value)" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="fontSizeSlider">
+                        </div>
+                        <div>
+                            <label for="widthSlider" class="block text-xs font-medium text-gray-700 mb-1">Text Width: <span id="widthValue">500</span></label>
+                            <input type="range" min="100" max="800" value="500" oninput="updateWidth(this.value)" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="widthSlider">
+                        </div>
+                        <div>
+                            <label for="lineSpacingSlider" class="block text-xs font-medium text-gray-700 mb-1">Line Spacing: <span id="lineSpacingValue">25</span></label>
+                            <input type="range" min="10" max="50" value="25" oninput="updateLineSpacing(this.value)" step="0.1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="lineSpacingSlider">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Controls -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold mb-3">📁 Files</h3>
+                    <input type="file" id="pageUploader" class="hidden">
+                    <input type="file" id="fontUploader" class="hidden">
+                    <div class="space-y-2">
+                        <button id="btnPageUpload" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded">
+                            <i class="fas fa-upload mr-1"></i>Upload Page
+                        </button>
+                        <button onclick="loadPage()" class="w-full bg-gray-600 hover:bg-gray-700 text-white text-sm py-2 px-3 rounded">
+                            <i class="fas fa-file mr-1"></i>Default Page
+                        </button>
+                        <button onclick="changeFont()" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 px-3 rounded">
+                            <i class="fas fa-font mr-1"></i>Switch Font
+                        </button>
+                        <button id="btnFontUpload" onclick="uploadFont()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 px-3 rounded">
+                            <i class="fas fa-upload mr-1"></i>Upload Font
+                        </button>
+                        <button onclick="save(str(pageNum++))" class="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded">
+                            <i class="fas fa-download mr-1"></i>Download Page
+                        </button>
+                    </div>
+                </div>
+                    </div>
+
+            <!-- Paper Preview -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-lg shadow p-4 h-fit">
+                    <div class="text-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">📝 Paper Preview</h3>
+                        <p class="text-sm text-gray-600">Live preview of your handwritten assignment</p>
+                    </div>
+                    <div id="contributing" class="flex justify-center bg-gray-50 rounded-lg p-4"></div>
+                    </div>
+                    </div>
+                </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-600">
+                    Designed with ❤️ by 
+                    <a href="https://github.com/UtkarshxDD" target="_blank" class="text-blue-600 hover:text-blue-700 font-medium">
+                        Utkarsh Singh
+                    </a>
+                </p>
+                    </div>
+                </div>
+        </footer>
     <script src="assets/js/p5.min.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/extend.js"></script>
+    <script src="assets/js/page-manager.js"></script>
+    <script src="assets/js/gemini-integration.js"></script>
     <script src="assets/js/sketch.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

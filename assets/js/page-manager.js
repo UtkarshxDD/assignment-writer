@@ -7,15 +7,15 @@ class PageManager {
         this.initializePageManagement();
     }
 
-    // Create new page data structure
+    // Create new page data structure with optimized defaults
     createNewPageData() {
         return {
             text: '',
-            xaxis: 20,
-            yaxis: 20,
-            fontsize: 30,
-            width: 700,
-            linespacing: 30,
+            xaxis: 50,       // Better left margin
+            yaxis: 80,       // Better top margin  
+            fontsize: 18,    // More readable font size
+            width: 500,      // Appropriate text width
+            linespacing: 25, // Better line spacing
             backgroundImage: null
         };
     }
@@ -99,11 +99,11 @@ class PageManager {
         }
         
         // Save current canvas settings
-        currentPage.xaxis = typeof xaxis !== 'undefined' ? xaxis : 20;
-        currentPage.yaxis = typeof yaxis !== 'undefined' ? yaxis : 20;
-        currentPage.fontsize = typeof fontsize !== 'undefined' ? fontsize : 30;
-        currentPage.width = typeof w !== 'undefined' ? w : 700;
-        currentPage.linespacing = typeof linespacing !== 'undefined' ? linespacing : 30;
+        currentPage.xaxis = typeof xaxis !== 'undefined' ? xaxis : 50;
+        currentPage.yaxis = typeof yaxis !== 'undefined' ? yaxis : 80;
+        currentPage.fontsize = typeof fontsize !== 'undefined' ? fontsize : 18;
+        currentPage.width = typeof w !== 'undefined' ? w : 500;
+        currentPage.linespacing = typeof linespacing !== 'undefined' ? linespacing : 25;
         
         // Save background image if available
         if (typeof img !== 'undefined') {
@@ -147,18 +147,23 @@ class PageManager {
 
     // Update slider values in UI
     updateSliders(pageData) {
-        const sliders = [
-            { id: 'xaxis', value: pageData.xaxis, property: 'xaxis' },
-            { id: 'yaxis', value: pageData.yaxis, property: 'yaxis' },
-            { id: 'fontsize', value: pageData.fontsize, property: 'fontsize' },
-            { id: 'width', value: pageData.width, property: 'width' },
-            { id: 'linespacing', value: pageData.linespacing, property: 'linespacing' }
+        const sliderUpdates = [
+            { sliderId: 'xAxisSlider', value: pageData.xaxis, displayId: 'xValue' },
+            { sliderId: 'yAxisSlider', value: pageData.yaxis, displayId: 'yValue' },
+            { sliderId: 'fontSizeSlider', value: pageData.fontsize, displayId: 'fontSizeValue' },
+            { sliderId: 'widthSlider', value: pageData.width, displayId: 'widthValue' },
+            { sliderId: 'lineSpacingSlider', value: pageData.linespacing, displayId: 'lineSpacingValue' }
         ];
 
-        sliders.forEach(slider => {
-            const sliderElement = document.querySelector(`input[oninput*="${slider.property}"]`);
+        sliderUpdates.forEach(update => {
+            const sliderElement = document.getElementById(update.sliderId);
+            const displayElement = document.getElementById(update.displayId);
+            
             if (sliderElement) {
-                sliderElement.value = slider.value;
+                sliderElement.value = update.value;
+            }
+            if (displayElement) {
+                displayElement.textContent = update.value;
             }
         });
     }
@@ -358,10 +363,19 @@ function updatePageIndicator() {
 
 // Update global variables function for p5.js integration
 function updateGlobalVariables(pageData) {
-    if (typeof window.myData !== 'undefined') window.myData = pageData.text || '';
-    if (typeof window.xaxis !== 'undefined') window.xaxis = pageData.xaxis;
-    if (typeof window.yaxis !== 'undefined') window.yaxis = pageData.yaxis;
-    if (typeof window.fontsize !== 'undefined') window.fontsize = pageData.fontsize;
-    if (typeof window.w !== 'undefined') window.w = pageData.width;
-    if (typeof window.linespacing !== 'undefined') window.linespacing = pageData.linespacing;
+    // Always set window variables for global access
+    window.myData = pageData.text || '';
+    window.xaxis = pageData.xaxis;
+    window.yaxis = pageData.yaxis;
+    window.fontsize = pageData.fontsize;
+    window.w = pageData.width;
+    window.linespacing = pageData.linespacing;
+    
+    console.log('Global variables updated:', {
+        xaxis: window.xaxis,
+        yaxis: window.yaxis,
+        fontsize: window.fontsize,
+        width: window.w,
+        linespacing: window.linespacing
+    });
 }
