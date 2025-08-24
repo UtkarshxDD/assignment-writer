@@ -1,4 +1,4 @@
-#Use here : https://vercel.com/utkarsh-singhs-projects-e5b9c656/assignment-writer
+#Use here : [https://vercel.com/utkarsh-singhs-projects-e5b9c656/assignment-writer](https://assignment-writer-beryl.vercel.app/)
 
 # AI Assignment Generation Feature
 
